@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: platform-observability-faulty
   namespace: argocd
+  labels:
+    image-updater: enabled
   annotations:
     argocd-image-updater.argoproj.io/image-list: app=ghcr.io/paddykim/platform-observability-faulty:main
     argocd-image-updater.argoproj.io/app.update-strategy: digest
