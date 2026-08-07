@@ -1,0 +1,61 @@
+{{- if .Values.monitoring.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "demo.name" . }}
+  labels:
+    {{- toYaml .Values.monitoring.labels | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "demo.name" . }}
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: {{ .Values.monitoring.scrapeInterval }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "demo.name" . }}
+  labels:
+    {{- toYaml .Values.monitoring.labels | nindent 4 }}
+spec:
+  groups:
+    - name: {{ include "demo.name" . }}.runtime
+      rules:
+        - alert: ObservabilityFaultyHighErrorRate
+          expr: |
+            sum(rate(http_requests_total{application={{ .Values.applicationName | quote }},status=~"5.."}[2m]))
+            / clamp_min(sum(rate(http_requests_total{application={{ .Values.applicationName | quote }}}[2m])), 0.000001)
+            > {{ .Values.monitoring.errorRateThreshold }}
+          for: 1m
+          labels:
+            severity: warning
+            application: {{ .Values.applicationName | quote }}
+          annotations:
+            summary: Faulty demo API 5xx error rate is elevated
+            description: The order endpoint is returning sustained 5xx responses.
+        - alert: ObservabilityFaultyHighLatency
+          expr: |
+            histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{application={{ .Values.applicationName | quote }}}[2m])))
+            > {{ .Values.monitoring.p95LatencySeconds }}
+          for: 1m
+          labels:
+            severity: warning
+            application: {{ .Values.applicationName | quote }}
+          annotations:
+            summary: Faulty demo API p95 latency is elevated
+            description: The order endpoint p95 latency exceeded one second.
+        - alert: ObservabilityFaultyPodsNotReady
+          expr: |
+            kube_deployment_status_replicas_available{namespace={{ .Release.Namespace | quote }},deployment={{ include "demo.name" . | quote }}}
+            < kube_deployment_spec_replicas{namespace={{ .Release.Namespace | quote }},deployment={{ include "demo.name" . | quote }}}
+          for: 2m
+          labels:
+            severity: critical
+            application: {{ .Values.applicationName | quote }}
+          annotations:
+            summary: Faulty demo pods are not ready
+            description: Available replicas are below the desired replica count.
+{{- end }}
