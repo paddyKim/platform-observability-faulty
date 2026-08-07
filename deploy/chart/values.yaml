@@ -1,7 +1,7 @@
 replicaCount: 1
 image:
   repository: ghcr.io/paddykim/platform-observability-faulty
-  tag: main@sha256:80a13a0952a18b60e72ee737bbe4afc59e00be1fe6a9e152d6bbb6ee22607a95
+  tag: main@sha256:f7a257688fb64fd75bb0961637ed72b90d80a019e4bdba9c2569d1515a6a9f3d
   pullPolicy: Always
 applicationName: platform-observability-faulty
 failureDelaySeconds: "1.25"
