@@ -1,16 +1,12 @@
 replicaCount: 1
-
 image:
   repository: ghcr.io/paddykim/platform-observability-faulty
-  tag: main
+  tag: main@sha256:80a13a0952a18b60e72ee737bbe4afc59e00be1fe6a9e152d6bbb6ee22607a95
   pullPolicy: Always
-
 applicationName: platform-observability-faulty
 failureDelaySeconds: "1.25"
-
 service:
   port: 8000
-
 monitoring:
   enabled: true
   labels:
@@ -18,7 +14,6 @@ monitoring:
   scrapeInterval: 15s
   errorRateThreshold: 0.2
   p95LatencySeconds: 1
-
 resources:
   requests:
     cpu: 50m
