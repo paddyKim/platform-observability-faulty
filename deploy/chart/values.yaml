@@ -14,7 +14,7 @@ service:
 monitoring:
   enabled: true
   labels:
-    release: kube-prometheus-stack
+    release: monitoring
   scrapeInterval: 15s
   errorRateThreshold: 0.2
   p95LatencySeconds: 1

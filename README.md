@@ -41,4 +41,6 @@ Assistant는 실행 권한이 없음을 밝히고 Argo CD 상태, 5xx error rate
 
 GitHub Actions, GHCR, Argo CD Image Updater digest/Git write-back, automated sync 설정은 healthy 저장소와 동일하다.
 
+기본 `monitoring.labels.release=monitoring`은 현재 검증 cluster의 Prometheus selector와 일치한다. 다른 cluster에서는 Prometheus의 ServiceMonitor/Rule selector를 먼저 확인한다.
+
 이 장애는 검증을 위해 의도적으로 구현되었다. 운영 workload에 적용하지 않는다. 현재 검증 범위는 metrics와 alert 기반 관측성이며 trace 기반 분산 APM은 포함하지 않는다.
